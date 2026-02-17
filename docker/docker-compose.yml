@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   # ── PostgreSQL ──────────────────────────────────
   postgres:
@@ -17,54 +15,64 @@ services:
       interval: 5s
       retries: 5
 
-  # ── Keycloak ────────────────────────────────────
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.0
-    command: start-dev --import-realm
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/kosm
-      KC_DB_SCHEMA: keycloak
-      KC_DB_USERNAME: kosm
-      KC_DB_PASSWORD: kosm_dev
-      KC_HOSTNAME_STRICT: 'false'
-      KC_HTTP_ENABLED: 'true'
+  # ── MailHog (dev mail catcher) ──────────────────
+  mailhog:
+    image: mailhog/mailhog:latest
     ports:
-      - '8080:8080'
-    volumes:
-      - ./keycloak:/opt/keycloak/data/import
+      - '1025:1025'   # SMTP
+      - '8025:8025'   # Web UI
+
+  # ── Backend API (NestJS) ────────────────────────
+  backend:
+    build:
+      context: ../packages/backend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: kosm
+      DB_PASSWORD: kosm_dev
+      DB_NAME: kosm
+      # Keycloak – externí instance na https://auth.localhost/
+      KEYCLOAK_URL: https://auth.localhost
+      KEYCLOAK_REALM: kosm
+      KEYCLOAK_CLIENT_ID: kosm-api
+      JWT_ISSUER: https://auth.localhost/realms/kosm
+      # CORS
+      CORS_ORIGINS: http://localhost:5173,http://localhost:5174
+      # Mail
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_FROM: noreply@kosm.local
+      # Guest token
+      GUEST_TOKEN_SECRET: change-me-in-production
     depends_on:
       postgres:
         condition: service_healthy
 
-  # ── MailHog (dev mail server) ───────────────────
-  mailhog:
-    image: mailhog/mailhog:latest
+  # ── Customer Frontend (React booking web) ───────
+  customer-fe:
+    build:
+      context: ../packages/customer-fe
+      dockerfile: Dockerfile
     ports:
-      - '1025:1025'  # SMTP
-      - '8025:8025'  # Web UI
+      - '5173:80'
+    depends_on:
+      - backend
 
-  # ── Backend API ─────────────────────────────────
-  # (for production-like testing, dev uses nest start --watch)
-  # backend:
-  #   build: ../packages/backend
-  #   ports:
-  #     - '3000:3000'
-  #   environment:
-  #     DB_HOST: postgres
-  #     DB_PORT: 5432
-  #     DB_USER: kosm
-  #     DB_PASSWORD: kosm_dev
-  #     DB_NAME: kosm
-  #     KEYCLOAK_URL: http://keycloak:8080
-  #     KEYCLOAK_REALM: kosm
-  #     MAIL_HOST: mailhog
-  #     MAIL_PORT: 1025
-  #   depends_on:
-  #     - postgres
-  #     - keycloak
+  # ── Staff Frontend (React staff portál) ─────────
+  staff-fe:
+    build:
+      context: ../packages/staff-fe
+      dockerfile: Dockerfile
+    ports:
+      - '5174:80'
+    depends_on:
+      - backend
 
 volumes:
   pg_data:

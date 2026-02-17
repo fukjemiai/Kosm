@@ -1,0 +1,221 @@
+{
+  "realm": "kosm",
+  "enabled": true,
+  "displayName": "Kosm – Beauty Salon",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "failureFactor": 5,
+  "sslRequired": "none",
+  "defaultSignatureAlgorithm": "RS256",
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+
+  "roles": {
+    "realm": [
+      { "name": "org_owner",      "description": "Vlastník organizace – plný přístup" },
+      { "name": "salon_manager",  "description": "Manažer salonu" },
+      { "name": "staff",          "description": "Zaměstnanec (kosmetička)" },
+      { "name": "accountant",     "description": "Účetní – doklady, exporty" },
+      { "name": "customer",       "description": "Zákazník" }
+    ]
+  },
+  "defaultRoles": ["customer"],
+
+  "clientScopes": [
+    {
+      "name": "kosm-scope",
+      "description": "Custom claims pro Kosm (org_id, salon_ids, staff_role)",
+      "protocol": "openid-connect",
+      "attributes": { "include.in.token.scope": "true" },
+      "protocolMappers": [
+        {
+          "name": "org_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "org_id",
+            "claim.name": "org_id",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "salon_ids",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "salon_ids",
+            "claim.name": "salon_ids",
+            "jsonType.label": "JSON",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "staff_role",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "staff_role",
+            "claim.name": "staff_role",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+
+  "clients": [
+    {
+      "clientId": "kosm-customer",
+      "name": "Kosm – Customer Booking",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocol": "openid-connect",
+      "rootUrl": "http://localhost:5173",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      },
+      "defaultClientScopes": ["openid", "profile", "email", "kosm-scope"]
+    },
+    {
+      "clientId": "kosm-staff",
+      "name": "Kosm – Staff Portal",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocol": "openid-connect",
+      "rootUrl": "http://localhost:5174",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:5174/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5174"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5174/*"
+      },
+      "defaultClientScopes": ["openid", "profile", "email", "kosm-scope"]
+    },
+    {
+      "clientId": "kosm-api",
+      "name": "Kosm – Backend API",
+      "description": "Bearer-only client pro validaci JWT v backendu",
+      "enabled": true,
+      "publicClient": false,
+      "bearerOnly": true,
+      "protocol": "openid-connect",
+      "defaultClientScopes": ["openid", "profile", "email", "kosm-scope"]
+    }
+  ],
+
+  "users": [
+    {
+      "username": "owner@kosm.local",
+      "email": "owner@kosm.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Eva",
+      "lastName": "Nováková",
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["org_owner"],
+      "attributes": { "org_id": ["00000000-0000-0000-0000-000000000001"] }
+    },
+    {
+      "username": "manager@kosm.local",
+      "email": "manager@kosm.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Petra",
+      "lastName": "Horáková",
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["salon_manager"],
+      "attributes": { "org_id": ["00000000-0000-0000-0000-000000000001"], "staff_role": ["MANAGER"] }
+    },
+    {
+      "username": "stylist@kosm.local",
+      "email": "stylist@kosm.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Jana",
+      "lastName": "Dvořáková",
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["staff"],
+      "attributes": { "org_id": ["00000000-0000-0000-0000-000000000001"], "staff_role": ["STYLIST"] }
+    },
+    {
+      "username": "junior@kosm.local",
+      "email": "junior@kosm.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Lucie",
+      "lastName": "Benešová",
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["staff"],
+      "attributes": { "org_id": ["00000000-0000-0000-0000-000000000001"], "staff_role": ["JUNIOR"] }
+    },
+    {
+      "username": "accountant@kosm.local",
+      "email": "accountant@kosm.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Hana",
+      "lastName": "Černá",
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["accountant"],
+      "attributes": { "org_id": ["00000000-0000-0000-0000-000000000001"] }
+    },
+    {
+      "username": "customer@kosm.local",
+      "email": "customer@kosm.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Marie",
+      "lastName": "Svobodová",
+      "credentials": [{ "type": "password", "value": "Password1!", "temporary": false }],
+      "realmRoles": ["customer"]
+    }
+  ]
+}
