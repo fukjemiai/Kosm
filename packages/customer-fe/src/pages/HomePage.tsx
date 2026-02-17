@@ -7,7 +7,7 @@ import type { Salon } from '../api/types';
 export function HomePage() {
   // In a real app, this would be a public endpoint listing active salons
   // For MVP, we use a placeholder
-  const { data: salons, loading } = useApiGet<Salon[]>('/salons/by-org/placeholder');
+  const { loading } = useApiGet<Salon[]>('/salons/by-org/placeholder');
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>

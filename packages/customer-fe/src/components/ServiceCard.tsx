@@ -1,5 +1,5 @@
 import { Card, CardContent, Typography, Button, Box, Chip } from '@mui/material';
-import { AccessTime, CurrencyExchange } from '@mui/icons-material';
+import { AccessTime } from '@mui/icons-material';
 import type { SalonService } from '../api/types';
 
 interface Props {

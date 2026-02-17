@@ -32,7 +32,7 @@ export function useApiMutation<TBody, TResponse = unknown>() {
       setLoading(true);
       setError(null);
       try {
-        const result = await api[method]<TResponse>(path, body, token || undefined);
+        const result = await (api[method] as any)(path, body, token || undefined) as TResponse;
         return result;
       } catch (err: any) {
         setError(err.message);
