@@ -18,7 +18,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: Error | null, user: unknown) {
+  handleRequest<TUser = any>(err: Error | null, user: TUser): TUser {
     if (err || !user) {
       throw err || new UnauthorizedException('Neplatný nebo chybějící token');
     }
