@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Typography, IconButton, Avatar, Box, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Avatar, Box } from '@mui/material';
 import { Logout } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Box, Typography, Card, CardContent, Chip, IconButton,
-  TextField, Select, MenuItem, FormControl, InputLabel,
+  TextField,
   CircularProgress, Alert,
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
@@ -55,7 +55,7 @@ export function CalendarPage() {
     setDate(d.toISOString().slice(0, 10));
   };
 
-  const handleAction = async (bookingId: string, action: string) => {
+  const _handleAction = async (bookingId: string, action: string) => {
     try {
       await api.put(`/bookings/${bookingId}/${action}`, {});
       // Refresh
