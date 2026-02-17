@@ -8,7 +8,7 @@ import { JwtPayload, RequestUser } from '../../common/interfaces/jwt-payload.int
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(config: ConfigService) {
-    const keycloakUrl = config.get('KEYCLOAK_URL', 'http://localhost:8080');
+    const keycloakUrl = config.get('KEYCLOAK_URL', 'https://auth.localhost');
     const realm = config.get('KEYCLOAK_REALM', 'kosm');
     const issuer = config.get('JWT_ISSUER', `${keycloakUrl}/realms/${realm}`);
 
