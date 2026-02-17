@@ -8,10 +8,10 @@ export class Customer extends BaseEntity {
   @Column({ name: 'keycloak_id', type: 'varchar', length: 255, nullable: true, unique: true })
   keycloakId: string | null;
 
-  @Column({ name: 'first_name', length: 100, nullable: true })
+  @Column({ name: 'first_name', type: 'varchar', length: 100, nullable: true })
   firstName: string | null;
 
-  @Column({ name: 'last_name', length: 100, nullable: true })
+  @Column({ name: 'last_name', type: 'varchar', length: 100, nullable: true })
   lastName: string | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
