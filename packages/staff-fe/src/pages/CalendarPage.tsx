@@ -55,19 +55,6 @@ export function CalendarPage() {
     setDate(d.toISOString().slice(0, 10));
   };
 
-  const _handleAction = async (bookingId: string, action: string) => {
-    try {
-      await api.put(`/bookings/${bookingId}/${action}`, {});
-      // Refresh
-      const from = `${date}T00:00:00`;
-      const to = `${date}T23:59:59`;
-      const updated = await api.get<Booking[]>(`/bookings/salon/${salonId}?from=${from}&to=${to}`);
-      setBookings(updated);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
   return (
     <Box>
       <Typography variant="h5" gutterBottom>Denní přehled</Typography>
