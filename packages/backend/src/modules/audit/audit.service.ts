@@ -27,8 +27,8 @@ export class AuditService {
       action: params.action,
       userId: params.userId ?? null,
       userEmail: params.userEmail ?? null,
-      oldValues: params.oldValues ?? null,
-      newValues: params.newValues ?? null,
+      oldValues: (params.oldValues ?? null) as any,
+      newValues: (params.newValues ?? null) as any,
       ipAddress: params.ipAddress ?? null,
     });
   }
