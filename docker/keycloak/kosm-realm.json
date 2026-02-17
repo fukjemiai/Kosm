@@ -1,0 +1,131 @@
+{
+  "realm": "kosm",
+  "enabled": true,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "roles": {
+    "realm": [
+      { "name": "org_owner", "description": "Vlastník organizace" },
+      { "name": "salon_manager", "description": "Manažer salonu" },
+      { "name": "staff", "description": "Zaměstnanec (kosmetička)" },
+      { "name": "accountant", "description": "Účetní" },
+      { "name": "customer", "description": "Zákazník" }
+    ]
+  },
+  "defaultRoles": ["customer"],
+  "clients": [
+    {
+      "clientId": "kosm-customer",
+      "name": "Kosm Customer Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:5173"],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "kosm-staff",
+      "name": "Kosm Staff Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:5174/*"],
+      "webOrigins": ["http://localhost:5174"],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "kosm-api",
+      "name": "Kosm Backend API",
+      "enabled": true,
+      "publicClient": false,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "kosm-scope",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "org_id-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "org_id",
+            "claim.name": "org_id",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "salon_ids-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "salon_ids",
+            "claim.name": "salon_ids",
+            "jsonType.label": "JSON",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "staff_role-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "staff_role",
+            "claim.name": "staff_role",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "owner@kosm.local",
+      "email": "owner@kosm.local",
+      "enabled": true,
+      "firstName": "Eva",
+      "lastName": "Nováková",
+      "credentials": [{ "type": "password", "value": "password", "temporary": false }],
+      "realmRoles": ["org_owner"],
+      "attributes": { "org_id": ["demo-org-id"] }
+    },
+    {
+      "username": "stylist@kosm.local",
+      "email": "stylist@kosm.local",
+      "enabled": true,
+      "firstName": "Jana",
+      "lastName": "Dvořáková",
+      "credentials": [{ "type": "password", "value": "password", "temporary": false }],
+      "realmRoles": ["staff"],
+      "attributes": { "org_id": ["demo-org-id"], "staff_role": ["STYLIST"] }
+    },
+    {
+      "username": "customer@kosm.local",
+      "email": "customer@kosm.local",
+      "enabled": true,
+      "firstName": "Marie",
+      "lastName": "Svobodová",
+      "credentials": [{ "type": "password", "value": "password", "temporary": false }],
+      "realmRoles": ["customer"]
+    }
+  ]
+}
