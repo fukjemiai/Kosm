@@ -59,6 +59,11 @@ services:
     build:
       context: ../packages/customer-fe
       dockerfile: Dockerfile
+      args:
+        VITE_KEYCLOAK_URL: https://auth.localhost
+        VITE_KEYCLOAK_REALM: kosm
+        VITE_KEYCLOAK_CLIENT_ID: kosm-customer
+        VITE_API_URL: http://localhost:3000
     ports:
       - '5173:80'
     depends_on:
@@ -69,6 +74,11 @@ services:
     build:
       context: ../packages/staff-fe
       dockerfile: Dockerfile
+      args:
+        VITE_KEYCLOAK_URL: https://auth.localhost
+        VITE_KEYCLOAK_REALM: kosm
+        VITE_KEYCLOAK_CLIENT_ID: kosm-staff
+        VITE_API_URL: http://localhost:3000
     ports:
       - '5174:80'
     depends_on:

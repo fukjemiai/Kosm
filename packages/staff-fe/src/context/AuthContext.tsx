@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [keycloak] = useState(
     () =>
       new Keycloak({
-        url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',
+        url: import.meta.env.VITE_KEYCLOAK_URL || 'https://auth.localhost',
         realm: import.meta.env.VITE_KEYCLOAK_REALM || 'kosm',
         clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'kosm-staff',
       }),
