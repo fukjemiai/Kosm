@@ -7,6 +7,7 @@ import {
 import { Add } from '@mui/icons-material';
 import { useApiGet } from '../hooks/useApi';
 import { api } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 interface Service {
   id: string;
@@ -19,8 +20,10 @@ interface Service {
 }
 
 export function ServicesPage() {
-  const orgId = 'placeholder';
-  const { data: services, loading, error, refetch } = useApiGet<Service[]>(`/services/by-org/${orgId}`);
+  const { orgId } = useAuth();
+  const { data: services, loading, error, refetch } = useApiGet<Service[]>(
+    orgId ? `/services/by-org/${orgId}` : null,
+  );
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', durationMinutes: 60, basePrice: 0 });
@@ -29,7 +32,7 @@ export function ServicesPage() {
   const handleCreate = async () => {
     setFormError(null);
     try {
-      await api.post('/services', { ...form, organizationId: orgId });
+      await api.post('/services', { ...form, organizationId: orgId! });
       setOpen(false);
       setForm({ name: '', description: '', durationMinutes: 60, basePrice: 0 });
       refetch();
@@ -47,6 +50,7 @@ export function ServicesPage() {
         </Button>
       </Box>
 
+      {!orgId && <Alert severity="warning" sx={{ mb: 2 }}>Chybí přiřazení organizace.</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {loading && <CircularProgress />}
 

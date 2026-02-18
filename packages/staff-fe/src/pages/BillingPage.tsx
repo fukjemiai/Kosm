@@ -8,6 +8,7 @@ import {
 import { Download } from '@mui/icons-material';
 import { useApiGet } from '../hooks/useApi';
 import { api } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 interface Invoice {
   id: string;
@@ -34,7 +35,7 @@ const statusColors: Record<string, 'success' | 'warning' | 'error' | 'info' | 'd
 };
 
 export function BillingPage() {
-  const orgId = 'placeholder';
+  const { orgId } = useAuth();
   const [from, setFrom] = useState(() => {
     const d = new Date();
     d.setDate(1);
@@ -43,7 +44,7 @@ export function BillingPage() {
   const [to, setTo] = useState(() => new Date().toISOString().slice(0, 10));
 
   const { data: invoices, loading, error, refetch } = useApiGet<Invoice[]>(
-    `/billing/invoices/by-org/${orgId}?from=${from}&to=${to}`,
+    orgId ? `/billing/invoices/by-org/${orgId}?from=${from}&to=${to}` : null,
     [from, to],
   );
 
@@ -70,6 +71,7 @@ export function BillingPage() {
   };
 
   const handleExport = (format: 'csv' | 'xlsx') => {
+    if (!orgId) return;
     window.open(`/api/v1/billing/export/${orgId}?from=${from}&to=${to}&format=${format}`, '_blank');
   };
 
@@ -92,6 +94,7 @@ export function BillingPage() {
         <TextField label="Do" type="date" value={to} onChange={(e) => setTo(e.target.value)} size="small" InputLabelProps={{ shrink: true }} />
       </Box>
 
+      {!orgId && <Alert severity="warning" sx={{ mb: 2 }}>Chybí přiřazení organizace.</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {loading && <CircularProgress />}
 

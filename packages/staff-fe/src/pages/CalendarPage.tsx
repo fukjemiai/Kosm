@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { api } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 interface Booking {
   id: string;
@@ -35,10 +36,11 @@ export function CalendarPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // In production, salonId comes from user context
-  const salonId = 'placeholder';
+  const { salonIds } = useAuth();
+  const salonId = salonIds[0] || null;
 
   useEffect(() => {
+    if (!salonId) return;
     setLoading(true);
     const from = `${date}T00:00:00`;
     const to = `${date}T23:59:59`;
@@ -47,7 +49,7 @@ export function CalendarPage() {
       .then(setBookings)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [date]);
+  }, [date, salonId]);
 
   const changeDate = (delta: number) => {
     const d = new Date(date);
@@ -73,6 +75,7 @@ export function CalendarPage() {
         </Typography>
       </Box>
 
+      {!salonId && <Alert severity="warning" sx={{ mb: 2 }}>Nemáte přiřazený žádný salon.</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       {loading ? (

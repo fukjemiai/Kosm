@@ -5,6 +5,7 @@ import {
   DialogContent, DialogActions,
 } from '@mui/material';
 import { api } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 interface Booking {
   id: string;
@@ -30,9 +31,11 @@ export function BookingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionDialog, setActionDialog] = useState<{ id: string; action: string } | null>(null);
 
-  const salonId = 'placeholder';
+  const { salonIds } = useAuth();
+  const salonId = salonIds[0] || null;
 
   const loadBookings = () => {
+    if (!salonId) return;
     setLoading(true);
     api
       .get<Booking[]>(`/bookings/salon/${salonId}?from=${dateFrom}T00:00:00&to=${dateTo}T23:59:59`)
@@ -41,7 +44,7 @@ export function BookingsPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { loadBookings(); }, [dateFrom, dateTo]);
+  useEffect(() => { loadBookings(); }, [dateFrom, dateTo, salonId]);
 
   const handleAction = async (id: string, action: string) => {
     try {
@@ -76,6 +79,7 @@ export function BookingsPage() {
         />
       </Box>
 
+      {!salonId && <Alert severity="warning" sx={{ mb: 2 }}>Nemáte přiřazený žádný salon.</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {loading && <CircularProgress />}
 
